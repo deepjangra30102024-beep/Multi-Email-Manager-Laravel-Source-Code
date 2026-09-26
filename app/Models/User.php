@@ -40,4 +40,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(EmailTemplate::class);
     }
+
+    public function emailTemplates()
+    {
+        return $this->hasMany(EmailTemplate::class);
+    }
 }

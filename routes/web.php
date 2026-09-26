@@ -20,6 +20,15 @@ Route::middleware('auth')->group(function () {
     // OAuth Routes
     Route::get('/oauth/google/redirect', [\App\Http\Controllers\OAuthController::class, 'redirect'])->name('oauth.google.redirect');
     Route::get('/oauth/google/callback', [\App\Http\Controllers\OAuthController::class, 'callback'])->name('oauth.google.callback');
+
+    // Email Accounts
+    Route::delete('/email-accounts/{emailAccount}', [\App\Http\Controllers\EmailAccountController::class, 'destroy'])->name('email-accounts.destroy');
+
+    // Inbox
+    Route::get('/inbox/{emailAccount}', [\App\Http\Controllers\InboxController::class, 'index'])->name('inbox.index');
+
+    // Templates
+    Route::resource('templates', \App\Http\Controllers\TemplateController::class)->except(['show']);
 });
 
 require __DIR__.'/auth.php';

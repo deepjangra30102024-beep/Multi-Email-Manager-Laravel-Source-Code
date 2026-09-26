@@ -54,8 +54,12 @@
                                                 {{ $account->created_at->format('M d, Y') }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">View Inbox</a>
-                                                <a href="#" class="text-red-600 hover:text-red-900">Disconnect</a>
+                                                <a href="{{ route('inbox.index', $account->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View Inbox</a>
+                                                <form action="{{ route('email-accounts.destroy', $account->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to disconnect this account?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900">Disconnect</button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach
