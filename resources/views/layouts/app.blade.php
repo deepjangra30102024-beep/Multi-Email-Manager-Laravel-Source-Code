@@ -15,22 +15,20 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+        <div class="h-screen flex overflow-hidden bg-gray-50" x-data="{ sidebarOpen: false }">
+            <!-- Sidebar -->
+            @include('layouts.sidebar')
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+            <!-- Main Content Area -->
+            <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+                <!-- Top Header -->
+                @include('layouts.header')
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+                <!-- Main Section -->
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
     </body>
 </html>

@@ -8,7 +8,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $emailAccounts = \Illuminate\Support\Facades\Auth::user()->emailAccounts;
+    return view('dashboard', compact('emailAccounts'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
