@@ -76,4 +76,19 @@ class InboxController extends Controller
             return back()->withInput()->with('error', 'Failed to send email. Please try again.');
         }
     }
+    public function destroy(EmailAccount $emailAccount, $messageId)
+    {
+        if ($emailAccount->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $googleService = new GoogleGmailService($emailAccount);
+        $success = $googleService->deleteEmail($messageId);
+
+        if ($success) {
+            return redirect()->route('inbox.index', $emailAccount)->with('success', 'Email deleted successfully.');
+        } else {
+            return redirect()->route('inbox.index', $emailAccount)->with('error', 'Failed to delete email.');
+        }
+    }
 }

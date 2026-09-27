@@ -251,4 +251,16 @@ class GoogleGmailService
             return false;
         }
     }
+    public function deleteEmail($messageId)
+    {
+        $gmail = new Gmail($this->client);
+
+        try {
+            $gmail->users_messages->trash('me', $messageId);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error deleting email: '.$e->getMessage());
+            return false;
+        }
+    }
 }

@@ -59,7 +59,7 @@
                             <select id="template" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" onchange="insertTemplate(this.value)">
                                 <option value="">Select a template...</option>
                                 @foreach($templates as $template)
-                                    <option value="{{ $template->id }}">{{ $template->name }}</option>
+                                    <option value="{{ $template->id }}">{{ $template->title }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -104,9 +104,9 @@
                 
                 const currentText = bodyField.value;
                 if (currentText) {
-                    bodyField.value = currentText + '\n\n' + template.body;
+                    bodyField.value = currentText + '\n\n' + template.content;
                 } else {
-                    bodyField.value = template.body;
+                    bodyField.value = template.content;
                 }
             }
         }

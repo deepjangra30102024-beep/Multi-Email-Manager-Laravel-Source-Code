@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/inbox/{emailAccount}/compose', [InboxController::class, 'compose'])->name('inbox.compose');
     Route::post('/inbox/{emailAccount}/send', [InboxController::class, 'send'])->name('inbox.send');
     Route::get('/inbox/{emailAccount}/{messageId}', [InboxController::class, 'show'])->name('inbox.show');
+    Route::delete('/inbox/{emailAccount}/{messageId}', [InboxController::class, 'destroy'])->name('inbox.destroy');
 
     // Templates
     Route::resource('templates', TemplateController::class)->except(['show']);
