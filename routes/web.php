@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
 
     // Inbox
     Route::get('/inbox/{emailAccount}', [\App\Http\Controllers\InboxController::class, 'index'])->name('inbox.index');
+    Route::get('/inbox/{emailAccount}/{messageId}', [\App\Http\Controllers\InboxController::class, 'show'])->name('inbox.show');
 
     // Templates
     Route::resource('templates', \App\Http\Controllers\TemplateController::class)->except(['show']);

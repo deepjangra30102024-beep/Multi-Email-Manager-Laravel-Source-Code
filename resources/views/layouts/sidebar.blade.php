@@ -14,13 +14,28 @@
                         Dashboard
                     </a>
 
-                    <!-- Inbox (Coming Soon) -->
-                    <a href="#" class="text-indigo-100 hover:bg-indigo-700 group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors duration-150">
-                        <svg class="text-indigo-300 group-hover:text-white flex-shrink-0 -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                        Inbox
-                    </a>
+                    <!-- Inbox Group -->
+                    <div class="px-3 mt-4 mb-2">
+                        <p class="text-xs font-semibold text-indigo-300 uppercase tracking-wider">Inboxes</p>
+                    </div>
+                    @php
+                        $userAccounts = Auth::user()->emailAccounts;
+                    @endphp
+                    
+                    @if($userAccounts->count() > 0)
+                        @foreach($userAccounts as $account)
+                            <a href="{{ route('inbox.index', $account) }}" class="{{ request()->url() == route('inbox.index', $account) ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-700' }} group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150">
+                                <svg class="{{ request()->url() == route('inbox.index', $account) ? 'text-white' : 'text-indigo-300 group-hover:text-white' }} flex-shrink-0 -ml-1 mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                <span class="truncate">{{ $account->email_address }}</span>
+                            </a>
+                        @endforeach
+                    @else
+                        <div class="px-3 py-2 text-sm text-indigo-300 italic">
+                            No accounts connected.
+                        </div>
+                    @endif
 
                     <!-- Templates -->
                     <a href="{{ route('templates.index') }}" class="{{ request()->routeIs('templates.*') ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors duration-150">

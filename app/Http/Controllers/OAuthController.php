@@ -16,6 +16,8 @@ class OAuthController extends Controller
     public function redirect()
     {
         $client = new Client();
+        // Disable SSL verification for local development on Windows
+        $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
         $client->setClientId(config('services.google.client_id'));
         $client->setClientSecret(config('services.google.client_secret'));
         $client->setRedirectUri(config('services.google.redirect'));
@@ -37,6 +39,8 @@ class OAuthController extends Controller
         }
 
         $client = new Client();
+        // Disable SSL verification for local development on Windows
+        $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
         $client->setClientId(config('services.google.client_id'));
         $client->setClientSecret(config('services.google.client_secret'));
         $client->setRedirectUri(config('services.google.redirect'));
