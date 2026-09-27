@@ -24,12 +24,22 @@
                     
                     @if($userAccounts->count() > 0)
                         @foreach($userAccounts as $account)
-                            <a href="{{ route('inbox.index', $account) }}" class="{{ request()->url() == route('inbox.index', $account) ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-700' }} group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150">
-                                <svg class="{{ request()->url() == route('inbox.index', $account) ? 'text-white' : 'text-indigo-300 group-hover:text-white' }} flex-shrink-0 -ml-1 mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                </svg>
-                                <span class="truncate">{{ $account->email_address }}</span>
-                            </a>
+                            @php
+                                $isActive = request()->url() == route('inbox.index', $account) || request()->url() == route('inbox.compose', $account) || request()->routeIs('inbox.show') && request()->route('emailAccount')->id == $account->id;
+                            @endphp
+                            <div class="flex items-center justify-between {{ $isActive ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-700' }} group rounded-md px-3 py-2 transition-colors duration-150">
+                                <a href="{{ route('inbox.index', $account) }}" class="flex items-center flex-1 text-sm font-medium">
+                                    <svg class="{{ $isActive ? 'text-white' : 'text-indigo-300 group-hover:text-white' }} flex-shrink-0 -ml-1 mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span class="truncate" style="max-width: 140px;" title="{{ $account->email_address }}">{{ $account->email_address }}</span>
+                                </a>
+                                <a href="{{ route('inbox.compose', $account) }}" class="ml-2 p-1 text-indigo-300 hover:text-white rounded hover:bg-indigo-600 transition-colors" title="Compose Email">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                </a>
+                            </div>
                         @endforeach
                     @else
                         <div class="px-3 py-2 text-sm text-indigo-300 italic">

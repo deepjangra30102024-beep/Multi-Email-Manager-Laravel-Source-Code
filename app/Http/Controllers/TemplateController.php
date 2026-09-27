@@ -14,6 +14,7 @@ class TemplateController extends Controller
     public function index()
     {
         $templates = Auth::user()->emailTemplates()->latest()->get();
+
         return view('templates.index', compact('templates'));
     }
 
@@ -49,6 +50,7 @@ class TemplateController extends Controller
         if ($template->user_id !== Auth::id()) {
             abort(403);
         }
+
         return view('templates.edit', compact('template'));
     }
 

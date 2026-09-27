@@ -7,9 +7,14 @@
                     <h2 class="text-2xl font-bold text-gray-800">
                         Inbox: {{ $emailAccount->email_address }}
                     </h2>
-                    <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-900 font-medium text-sm inline-block mt-1">
-                        &larr; Back to Dashboard
-                    </a>
+                    <div class="flex items-center space-x-4 mt-1">
+                        <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-900 font-medium text-sm inline-block">
+                            &larr; Back to Dashboard
+                        </a>
+                        <a href="{{ route('inbox.compose', $emailAccount) }}" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition ease-in-out duration-150">
+                            Compose Email
+                        </a>
+                    </div>
                 </div>
 
                 <form method="GET" action="{{ route('inbox.index', $emailAccount) }}" class="flex">

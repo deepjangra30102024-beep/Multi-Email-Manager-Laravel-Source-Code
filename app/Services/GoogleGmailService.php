@@ -3,21 +3,23 @@
 namespace App\Services;
 
 use App\Models\EmailAccount;
+use Carbon\Carbon;
 use Google\Client;
 use Google\Service\Gmail;
+use Google\Service\Gmail\Message;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class GoogleGmailService
 {
     protected $client;
+
     protected $emailAccount;
 
     public function __construct(EmailAccount $emailAccount)
     {
         $this->emailAccount = $emailAccount;
-        
-        $this->client = new Client();
+
+        $this->client = new Client;
         // Disable SSL verification for local development on Windows
         $this->client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
         $this->client->setClientId(config('services.google.client_id'));
@@ -29,20 +31,20 @@ class GoogleGmailService
             'refresh_token' => $emailAccount->refresh_token,
             'expires_in' => $emailAccount->expires_in,
         ];
-        
+
         $this->client->setAccessToken($token);
 
         // Check if token is expired and refresh it
         if ($this->client->isAccessTokenExpired()) {
             if ($this->client->getRefreshToken()) {
                 $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-                if (!isset($newToken['error'])) {
+                if (! isset($newToken['error'])) {
                     $this->emailAccount->update([
                         'access_token' => $newToken['access_token'],
                         'expires_in' => $newToken['expires_in'] ?? 3599,
                     ]);
                 } else {
-                    Log::error('Failed to refresh token: ' . json_encode($newToken));
+                    Log::error('Failed to refresh token: '.json_encode($newToken));
                 }
             }
         }
@@ -51,12 +53,12 @@ class GoogleGmailService
     public function getLatestEmails($limit = 15, $pageToken = null, $query = null)
     {
         $gmail = new Gmail($this->client);
-        
+
         try {
             $optParams = [
                 'maxResults' => $limit,
             ];
-            
+
             if ($query) {
                 $optParams['q'] = $query;
             } else {
@@ -66,22 +68,22 @@ class GoogleGmailService
             if ($pageToken) {
                 $optParams['pageToken'] = $pageToken;
             }
-            
+
             $messagesResponse = $gmail->users_messages->listUsersMessages('me', $optParams);
             $messages = $messagesResponse->getMessages();
             $nextPageToken = $messagesResponse->getNextPageToken();
-            
+
             $emails = [];
-            
+
             if ($messages) {
                 foreach ($messages as $message) {
                     $msg = $gmail->users_messages->get('me', $message->getId(), ['format' => 'metadata']);
-                    
+
                     $headers = $msg->getPayload()->getHeaders();
                     $subject = '';
                     $from = '';
                     $date = '';
-                    
+
                     foreach ($headers as $header) {
                         if ($header->getName() === 'Subject') {
                             $subject = $header->getValue();
@@ -97,7 +99,7 @@ class GoogleGmailService
                             }
                         }
                     }
-                    
+
                     $emails[] = [
                         'id' => $message->getId(),
                         'subject' => $subject ?: '(No Subject)',
@@ -107,16 +109,17 @@ class GoogleGmailService
                     ];
                 }
             }
-            
+
             return [
                 'emails' => $emails,
-                'nextPageToken' => $nextPageToken
+                'nextPageToken' => $nextPageToken,
             ];
         } catch (\Exception $e) {
-            Log::error('Error fetching emails: ' . $e->getMessage());
+            Log::error('Error fetching emails: '.$e->getMessage());
+
             return [
                 'emails' => [],
-                'nextPageToken' => null
+                'nextPageToken' => null,
             ];
         }
     }
@@ -131,16 +134,16 @@ class GoogleGmailService
     public function getEmail($messageId)
     {
         $gmail = new Gmail($this->client);
-        
+
         try {
             $msg = $gmail->users_messages->get('me', $messageId, ['format' => 'full']);
-            
+
             $headers = $msg->getPayload()->getHeaders();
             $subject = '';
             $from = '';
             $to = '';
             $date = '';
-            
+
             foreach ($headers as $header) {
                 if ($header->getName() === 'Subject') {
                     $subject = $header->getValue();
@@ -159,7 +162,7 @@ class GoogleGmailService
                     }
                 }
             }
-            
+
             $body = $this->getBody($msg->getPayload());
 
             return [
@@ -172,7 +175,8 @@ class GoogleGmailService
                 'snippet' => $msg->getSnippet(),
             ];
         } catch (\Exception $e) {
-            Log::error('Error fetching single email: ' . $e->getMessage());
+            Log::error('Error fetching single email: '.$e->getMessage());
+
             return null;
         }
     }
@@ -181,7 +185,7 @@ class GoogleGmailService
     {
         $body = '';
         $foundHtml = false;
-        
+
         // If there are parts, recursively find the body
         if ($payload->getParts()) {
             foreach ($payload->getParts() as $part) {
@@ -189,10 +193,10 @@ class GoogleGmailService
                     $body = $this->decodeBody($part->getBody()->getData());
                     $foundHtml = true;
                     break;
-                } else if ($part->getMimeType() === 'text/plain' && !$foundHtml) {
+                } elseif ($part->getMimeType() === 'text/plain' && ! $foundHtml) {
                     $body = $this->decodeBody($part->getBody()->getData());
                     // Keep looking for HTML
-                } else if ($part->getParts()) {
+                } elseif ($part->getParts()) {
                     // It's a multipart/alternative or mixed
                     $nestedBody = $this->getBody($part);
                     if ($nestedBody) {
@@ -212,9 +216,39 @@ class GoogleGmailService
 
     private function decodeBody($data)
     {
-        if (!$data) return '';
+        if (! $data) {
+            return '';
+        }
         // Gmail API uses URL-safe Base64
         $data = str_replace(['-', '_'], ['+', '/'], $data);
+
         return base64_decode($data);
+    }
+
+    public function sendEmail($to, $subject, $bodyText)
+    {
+        $gmail = new Gmail($this->client);
+
+        try {
+            $message = new Message;
+
+            $rawMessageString = "To: {$to}\r\n";
+            $rawMessageString .= 'Subject: =?utf-8?B?'.base64_encode($subject)."?=\r\n";
+            $rawMessageString .= "Content-Type: text/html; charset=utf-8\r\n";
+            $rawMessageString .= "MIME-Version: 1.0\r\n\r\n";
+            $rawMessageString .= $bodyText;
+
+            $rawMessage = rtrim(strtr(base64_encode($rawMessageString), '+/', '-_'), '=');
+
+            $message->setRaw($rawMessage);
+
+            $gmail->users_messages->send('me', $message);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error sending email: '.$e->getMessage());
+
+            return false;
+        }
     }
 }

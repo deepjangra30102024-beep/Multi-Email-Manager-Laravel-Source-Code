@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Models\EmailAccount;
 use Google\Client;
+use Google\Service\Oauth2;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OAuthController extends Controller
@@ -15,7 +15,7 @@ class OAuthController extends Controller
      */
     public function redirect()
     {
-        $client = new Client();
+        $client = new Client;
         // Disable SSL verification for local development on Windows
         $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
         $client->setClientId(config('services.google.client_id'));
@@ -38,7 +38,7 @@ class OAuthController extends Controller
             return redirect('/dashboard')->with('error', 'Google authentication was denied.');
         }
 
-        $client = new Client();
+        $client = new Client;
         // Disable SSL verification for local development on Windows
         $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
         $client->setClientId(config('services.google.client_id'));
@@ -55,7 +55,7 @@ class OAuthController extends Controller
         $client->setAccessToken($token);
 
         // Get user info from Google
-        $oauth2 = new \Google\Service\Oauth2($client);
+        $oauth2 = new Oauth2($client);
         $googleUser = $oauth2->userinfo->get();
 
         $user = Auth::user();

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\EmailAccount;
-use Illuminate\Support\Facades\Auth;
+use App\Models\EmailTemplate;
 use App\Services\GoogleGmailService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InboxController extends Controller
 {
@@ -36,10 +37,43 @@ class InboxController extends Controller
         $googleService = new GoogleGmailService($emailAccount);
         $email = $googleService->getEmail($messageId);
 
-        if (!$email) {
+        if (! $email) {
             return redirect()->route('inbox.index', $emailAccount)->with('error', 'Email not found.');
         }
 
         return view('inbox.show', compact('emailAccount', 'email'));
+    }
+
+    public function compose(EmailAccount $emailAccount)
+    {
+        if ($emailAccount->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $templates = EmailTemplate::where('user_id', Auth::id())->get();
+
+        return view('inbox.compose', compact('emailAccount', 'templates'));
+    }
+
+    public function send(Request $request, EmailAccount $emailAccount)
+    {
+        if ($emailAccount->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'to' => 'required|email',
+            'subject' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
+
+        $googleService = new GoogleGmailService($emailAccount);
+        $success = $googleService->sendEmail($request->to, $request->subject, $request->body);
+
+        if ($success) {
+            return redirect()->route('inbox.index', $emailAccount)->with('success', 'Email sent successfully!');
+        } else {
+            return back()->withInput()->with('error', 'Failed to send email. Please try again.');
+        }
     }
 }

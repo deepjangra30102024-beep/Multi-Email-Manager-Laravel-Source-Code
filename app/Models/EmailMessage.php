@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Database\Factories\EmailMessageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class EmailMessage extends Model
 {
-    /** @use HasFactory<\Database\Factories\EmailMessageFactory> */
+    /** @use HasFactory<EmailMessageFactory> */
     use HasFactory;
 }

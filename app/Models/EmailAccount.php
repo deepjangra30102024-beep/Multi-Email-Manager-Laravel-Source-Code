@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\EmailAccountFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class EmailAccount extends Model
 {
-    /** @use HasFactory<\Database\Factories\EmailAccountFactory> */
+    /** @use HasFactory<EmailAccountFactory> */
     use HasFactory;
 
     protected $fillable = [
