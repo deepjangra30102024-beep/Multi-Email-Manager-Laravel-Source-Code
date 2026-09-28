@@ -71,6 +71,16 @@
                         </svg>
                         Settings
                     </a>
+
+                    <!-- Admin Users -->
+                    @if(Auth::user()->is_admin)
+                        <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors duration-150">
+                            <svg class="{{ request()->routeIs('users.*') ? 'text-white' : 'text-indigo-300 group-hover:text-white' }} flex-shrink-0 -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                            Users Management
+                        </a>
+                    @endif
                 </nav>
             </div>
             
